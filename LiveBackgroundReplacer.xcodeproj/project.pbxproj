@@ -11,6 +11,11 @@
 		637FF4BD2C760EA300105BF5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4BC2C760EA300105BF5 /* ContentView.swift */; };
 		637FF4BF2C760EA400105BF5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 637FF4BE2C760EA400105BF5 /* Assets.xcassets */; };
 		637FF4C22C760EA400105BF5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 637FF4C12C760EA400105BF5 /* Preview Assets.xcassets */; };
+		637FF4CA2C760F1D00105BF5 /* FrameProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4C92C760F1D00105BF5 /* FrameProcessor.swift */; };
+		637FF4CC2C760F5100105BF5 /* VideoCameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4CB2C760F5100105BF5 /* VideoCameraController.swift */; };
+		637FF4CE2C760F7F00105BF5 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4CD2C760F7F00105BF5 /* Renderer.swift */; };
+		637FF4D02C760FB500105BF5 /* MetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4CF2C760FB500105BF5 /* MetalView.swift */; };
+		637FF4D22C760FED00105BF5 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4D12C760FED00105BF5 /* CameraView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +25,11 @@
 		637FF4BE2C760EA400105BF5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		637FF4C12C760EA400105BF5 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		637FF4C32C760EA400105BF5 /* LiveBackgroundReplacer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LiveBackgroundReplacer.entitlements; sourceTree = "<group>"; };
+		637FF4C92C760F1D00105BF5 /* FrameProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameProcessor.swift; sourceTree = "<group>"; };
+		637FF4CB2C760F5100105BF5 /* VideoCameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCameraController.swift; sourceTree = "<group>"; };
+		637FF4CD2C760F7F00105BF5 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		637FF4CF2C760FB500105BF5 /* MetalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalView.swift; sourceTree = "<group>"; };
+		637FF4D12C760FED00105BF5 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +63,12 @@
 			isa = PBXGroup;
 			children = (
 				637FF4BA2C760EA300105BF5 /* LiveBackgroundReplacerApp.swift */,
+				637FF4CB2C760F5100105BF5 /* VideoCameraController.swift */,
+				637FF4C92C760F1D00105BF5 /* FrameProcessor.swift */,
 				637FF4BC2C760EA300105BF5 /* ContentView.swift */,
+				637FF4CD2C760F7F00105BF5 /* Renderer.swift */,
+				637FF4CF2C760FB500105BF5 /* MetalView.swift */,
+				637FF4D12C760FED00105BF5 /* CameraView.swift */,
 				637FF4BE2C760EA400105BF5 /* Assets.xcassets */,
 				637FF4C32C760EA400105BF5 /* LiveBackgroundReplacer.entitlements */,
 				637FF4C02C760EA400105BF5 /* Preview Content */,
@@ -139,8 +154,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				637FF4D02C760FB500105BF5 /* MetalView.swift in Sources */,
+				637FF4D22C760FED00105BF5 /* CameraView.swift in Sources */,
 				637FF4BD2C760EA300105BF5 /* ContentView.swift in Sources */,
 				637FF4BB2C760EA300105BF5 /* LiveBackgroundReplacerApp.swift in Sources */,
+				637FF4CC2C760F5100105BF5 /* VideoCameraController.swift in Sources */,
+				637FF4CE2C760F7F00105BF5 /* Renderer.swift in Sources */,
+				637FF4CA2C760F1D00105BF5 /* FrameProcessor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,11 +297,13 @@
 				DEVELOPMENT_ASSET_PATHS = "\"LiveBackgroundReplacer/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access required to capture video frames";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.LiveBackgroundReplacer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -302,11 +324,13 @@
 				DEVELOPMENT_ASSET_PATHS = "\"LiveBackgroundReplacer/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access required to capture video frames";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 14.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.LiveBackgroundReplacer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
