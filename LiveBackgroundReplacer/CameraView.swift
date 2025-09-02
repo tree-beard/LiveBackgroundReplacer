@@ -11,13 +11,8 @@ import MetalKit
 
 struct CameraView: NSViewRepresentable {
 
-    func makeCoordinator() -> Renderer {
-        return Renderer()
-    }
-
     func makeNSView(context: NSViewRepresentableContext<CameraView>) -> MTKView {
         let mtkView = MetalView()
-        mtkView.setRenderer(context.coordinator)
         return mtkView
     }
 

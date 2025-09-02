@@ -11,6 +11,7 @@ import MetalKit
 class MetalView: MTKView {
 
     var cameraController : VideoCameraController?
+    var renderer : Renderer?
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -29,9 +30,7 @@ class MetalView: MTKView {
         self.isPaused = false
         self.colorPixelFormat = .rgba8Unorm
         self.cameraController = VideoCameraController(FrameProcessor())
-    }
-
-    public func setRenderer(_ renderer: Renderer?) {
+        self.renderer = Renderer()
         self.delegate = renderer
         let frameProcessor = cameraController?.frameProcessor
         frameProcessor?.delegate = renderer
