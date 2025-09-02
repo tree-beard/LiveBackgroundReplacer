@@ -16,6 +16,7 @@
 		637FF4CE2C760F7F00105BF5 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4CD2C760F7F00105BF5 /* Renderer.swift */; };
 		637FF4D02C760FB500105BF5 /* MetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4CF2C760FB500105BF5 /* MetalView.swift */; };
 		637FF4D22C760FED00105BF5 /* CameraViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4D12C760FED00105BF5 /* CameraViewRepresentable.swift */; };
+		63F6ECFD2E6771C200A755BC /* UIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F6ECFC2E6771C200A755BC /* UIComponents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		637FF4CD2C760F7F00105BF5 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		637FF4CF2C760FB500105BF5 /* MetalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalView.swift; sourceTree = "<group>"; };
 		637FF4D12C760FED00105BF5 /* CameraViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewRepresentable.swift; sourceTree = "<group>"; };
+		63F6ECFC2E6771C200A755BC /* UIComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIComponents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 				637FF4BA2C760EA300105BF5 /* LiveBackgroundReplacerApp.swift */,
 				637FF4CB2C760F5100105BF5 /* VideoCameraController.swift */,
 				637FF4C92C760F1D00105BF5 /* FrameProcessor.swift */,
+				63F6ECFC2E6771C200A755BC /* UIComponents.swift */,
 				637FF4BC2C760EA300105BF5 /* ContentView.swift */,
 				637FF4CD2C760F7F00105BF5 /* Renderer.swift */,
 				637FF4CF2C760FB500105BF5 /* MetalView.swift */,
@@ -112,7 +115,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					637FF4B62C760EA300105BF5 = {
 						CreatedOnToolsVersion = 15.4;
@@ -155,6 +158,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				637FF4D02C760FB500105BF5 /* MetalView.swift in Sources */,
+				63F6ECFD2E6771C200A755BC /* UIComponents.swift in Sources */,
 				637FF4D22C760FED00105BF5 /* CameraViewRepresentable.swift in Sources */,
 				637FF4BD2C760EA300105BF5 /* ContentView.swift in Sources */,
 				637FF4BB2C760EA300105BF5 /* LiveBackgroundReplacerApp.swift in Sources */,
@@ -201,6 +205,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -264,6 +269,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -294,6 +300,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"LiveBackgroundReplacer/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -321,6 +328,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"LiveBackgroundReplacer/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
