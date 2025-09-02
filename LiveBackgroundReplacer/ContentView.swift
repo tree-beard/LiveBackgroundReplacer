@@ -11,10 +11,9 @@ struct ContentView: View {
     var body: some View {
         VStack {
             CameraViewRepresentable()
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Live background replacer demo")
+            CameraButton {
+                print("Camera button tapped!")
+            }
         }
         .padding()
     }
