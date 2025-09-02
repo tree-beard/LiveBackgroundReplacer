@@ -9,9 +9,9 @@ import Foundation
 import SwiftUI
 import MetalKit
 
-struct CameraView: NSViewRepresentable {
+struct CameraViewRepresentable: NSViewRepresentable {
 
-    func makeNSView(context: NSViewRepresentableContext<CameraView>) -> MTKView {
+    func makeNSView(context: NSViewRepresentableContext<CameraViewRepresentable>) -> MTKView {
         let mtkView = MetalView()
         return mtkView
     }

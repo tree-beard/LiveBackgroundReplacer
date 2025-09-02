@@ -15,7 +15,7 @@
 		637FF4CC2C760F5100105BF5 /* VideoCameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4CB2C760F5100105BF5 /* VideoCameraController.swift */; };
 		637FF4CE2C760F7F00105BF5 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4CD2C760F7F00105BF5 /* Renderer.swift */; };
 		637FF4D02C760FB500105BF5 /* MetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4CF2C760FB500105BF5 /* MetalView.swift */; };
-		637FF4D22C760FED00105BF5 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4D12C760FED00105BF5 /* CameraView.swift */; };
+		637FF4D22C760FED00105BF5 /* CameraViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4D12C760FED00105BF5 /* CameraViewRepresentable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,7 +29,7 @@
 		637FF4CB2C760F5100105BF5 /* VideoCameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCameraController.swift; sourceTree = "<group>"; };
 		637FF4CD2C760F7F00105BF5 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		637FF4CF2C760FB500105BF5 /* MetalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalView.swift; sourceTree = "<group>"; };
-		637FF4D12C760FED00105BF5 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		637FF4D12C760FED00105BF5 /* CameraViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewRepresentable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,7 +68,7 @@
 				637FF4BC2C760EA300105BF5 /* ContentView.swift */,
 				637FF4CD2C760F7F00105BF5 /* Renderer.swift */,
 				637FF4CF2C760FB500105BF5 /* MetalView.swift */,
-				637FF4D12C760FED00105BF5 /* CameraView.swift */,
+				637FF4D12C760FED00105BF5 /* CameraViewRepresentable.swift */,
 				637FF4BE2C760EA400105BF5 /* Assets.xcassets */,
 				637FF4C32C760EA400105BF5 /* LiveBackgroundReplacer.entitlements */,
 				637FF4C02C760EA400105BF5 /* Preview Content */,
@@ -155,7 +155,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				637FF4D02C760FB500105BF5 /* MetalView.swift in Sources */,
-				637FF4D22C760FED00105BF5 /* CameraView.swift in Sources */,
+				637FF4D22C760FED00105BF5 /* CameraViewRepresentable.swift in Sources */,
 				637FF4BD2C760EA300105BF5 /* ContentView.swift in Sources */,
 				637FF4BB2C760EA300105BF5 /* LiveBackgroundReplacerApp.swift in Sources */,
 				637FF4CC2C760F5100105BF5 /* VideoCameraController.swift in Sources */,
