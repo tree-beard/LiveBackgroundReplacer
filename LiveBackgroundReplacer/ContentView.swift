@@ -12,7 +12,6 @@ struct ContentView: View {
         VStack {
             CameraViewRepresentable()
             CameraButton {
-                // Handle camera button tap
                 print("Camera button tapped!")
             }
         }
