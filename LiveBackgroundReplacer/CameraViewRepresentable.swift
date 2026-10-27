@@ -1,22 +1,20 @@
-//
-//  CameraView.swift
-//  LiveBackgroundReplacer
-//
-//  Created by David Arakelyan on 21.08.2024.
-//
-
-import Foundation
 import SwiftUI
 import MetalKit
 
 struct CameraViewRepresentable: NSViewRepresentable {
+    let renderer: Renderer
 
-    func makeNSView(context: NSViewRepresentableContext<CameraViewRepresentable>) -> MTKView {
-        let mtkView = MetalView()
-        return mtkView
+    func makeCoordinator() -> Renderer { renderer }
+
+    func makeNSView(context: Context) -> MetalView {
+        let view = MetalView(device: renderer.device)
+        renderer.attach(to: view)
+        return view
     }
 
-    func updateNSView(_ nsView: NSViewType, context: Context) {
+    func updateNSView(_ nsView: MetalView, context: Context) {}
 
+    static func dismantleNSView(_ nsView: MetalView, coordinator: Renderer) {
+        coordinator.detach()
     }
 }

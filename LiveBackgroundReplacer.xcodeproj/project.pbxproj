@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A10000000000000000000001 /* WorkspaceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* WorkspaceModel.swift */; };
 		637FF4BB2C760EA300105BF5 /* LiveBackgroundReplacerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4BA2C760EA300105BF5 /* LiveBackgroundReplacerApp.swift */; };
 		637FF4BD2C760EA300105BF5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637FF4BC2C760EA300105BF5 /* ContentView.swift */; };
 		637FF4BF2C760EA400105BF5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 637FF4BE2C760EA400105BF5 /* Assets.xcassets */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A10000000000000000000002 /* WorkspaceModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceModel.swift; sourceTree = "<group>"; };
 		637FF4B72C760EA300105BF5 /* LiveBackgroundReplacer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LiveBackgroundReplacer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		637FF4BA2C760EA300105BF5 /* LiveBackgroundReplacerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveBackgroundReplacerApp.swift; sourceTree = "<group>"; };
 		637FF4BC2C760EA300105BF5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -65,6 +67,7 @@
 			isa = PBXGroup;
 			children = (
 				637FF4BA2C760EA300105BF5 /* LiveBackgroundReplacerApp.swift */,
+				A10000000000000000000002 /* WorkspaceModel.swift */,
 				637FF4CB2C760F5100105BF5 /* VideoCameraController.swift */,
 				637FF4C92C760F1D00105BF5 /* FrameProcessor.swift */,
 				63F6ECFC2E6771C200A755BC /* UIComponents.swift */,
@@ -165,6 +168,7 @@
 				637FF4CC2C760F5100105BF5 /* VideoCameraController.swift in Sources */,
 				637FF4CE2C760F7F00105BF5 /* Renderer.swift in Sources */,
 				637FF4CA2C760F1D00105BF5 /* FrameProcessor.swift in Sources */,
+				A10000000000000000000001 /* WorkspaceModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

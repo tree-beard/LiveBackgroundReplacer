@@ -1,38 +1,17 @@
-//
-//  MetalView.swift
-//  LiveBackgroundReplacer
-//
-//  Created by David Arakelyan on 21.08.2024.
-//
-
-import Foundation
 import MetalKit
 
-class MetalView: MTKView {
-
-    var cameraController : VideoCameraController?
-    var renderer : Renderer?
-
-    required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+final class MetalView: MTKView {
+    init(device: MTLDevice) {
+        super.init(frame: .zero, device: device)
+        framebufferOnly = false
+        colorPixelFormat = .bgra8Unorm
+        isPaused = true
+        enableSetNeedsDisplay = true
+        autoResizeDrawable = true
     }
 
-    init() {
-        super.init(frame: .zero, device: MTLCreateSystemDefaultDevice())
-        self.preferredFramesPerSecond = 30
-        self.enableSetNeedsDisplay = true
-        if let metalDevice = MTLCreateSystemDefaultDevice() {
-            self.device = metalDevice
-        }
-        self.framebufferOnly = false
-        self.drawableSize = self.frame.size
-        self.enableSetNeedsDisplay = true
-        self.isPaused = false
-        self.colorPixelFormat = .rgba8Unorm
-        self.cameraController = VideoCameraController(FrameProcessor())
-        self.renderer = Renderer()
-        self.delegate = renderer
-        let frameProcessor = cameraController?.frameProcessor
-        frameProcessor?.delegate = renderer
+    @available(*, unavailable)
+    required init(coder: NSCoder) {
+        fatalError("Use init(device:)")
     }
 }

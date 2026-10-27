@@ -1,82 +1,134 @@
-//
-//  Renderer.swift
-//  LiveBackgroundReplacer
-//
-//  Created by David Arakelyan on 21.08.2024.
-//
-
-import Foundation
 import MetalKit
-import CoreGraphics
 import CoreImage
 
-class Renderer: NSObject, MTKViewDelegate, FrameProcessorDelegate {
-
-    private var metalDevice: MTLDevice!
-    private var commandQueue: MTLCommandQueue!
-    private var context: CIContext!
-    private var image: CIImage!
+/// View attachment and drawing happen on the main thread. submit is thread safe
+/// and holds at most one pending frame when the UI cannot keep up.
+final class Renderer: NSObject, MTKViewDelegate {
+    let device: MTLDevice
+    private let commandQueue: MTLCommandQueue
+    private let context: CIContext
     private let colorSpace = CGColorSpaceCreateDeviceRGB()
+    private weak var view: MTKView?
+    private var image: CIImage?
+    private var renderedImage: CIImage?
+    private let frameLock = NSLock()
+    private let inFlight = DispatchSemaphore(value: 3)
+    private var pendingImage: CIImage?
+    private var deliveryScheduled = false
+    private var acceptingFrames = false
+    private var redrawPending = false
+    var mirrored = true {
+        didSet { view?.needsDisplay = true }
+    }
 
-
-    override init() {
-
-        if let metalDevice = MTLCreateSystemDefaultDevice() {
-            self.metalDevice = metalDevice
-        }
-
-        self.context = CIContext(mtlDevice: metalDevice)
-        self.commandQueue = self.metalDevice.makeCommandQueue()
-
+    init(device: MTLDevice) throws {
+        guard let queue = device.makeCommandQueue() else { throw RendererError.unavailable }
+        self.device = device
+        commandQueue = queue
+        context = CIContext(mtlDevice: device)
         super.init()
     }
 
-    func update(_ frame: CIImage) {
-        image = frame
+    func attach(to view: MTKView) {
+        self.view = view
+        view.delegate = self
+        view.needsDisplay = true
+    }
+
+    func detach() {
+        view?.delegate = nil
+        view = nil
+    }
+
+    func setAcceptingFrames(_ accepting: Bool) {
+        frameLock.lock()
+        acceptingFrames = accepting
+        if !accepting { pendingImage = nil }
+        frameLock.unlock()
+        if !accepting {
+            image = nil
+            renderedImage = nil
+            view?.needsDisplay = true
+        }
+    }
+
+    func submit(_ frame: CIImage) {
+        frameLock.lock()
+        guard acceptingFrames else { frameLock.unlock(); return }
+        pendingImage = frame
+        let schedule = !deliveryScheduled
+        deliveryScheduled = true
+        frameLock.unlock()
+        guard schedule else { return }
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.frameLock.lock()
+            let latest = self.pendingImage
+            self.pendingImage = nil
+            self.deliveryScheduled = false
+            self.frameLock.unlock()
+            if let latest {
+                self.image = latest
+                self.view?.needsDisplay = true
+            }
+        }
     }
 
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+        view.needsDisplay = true
+    }
 
+    /// Capture the last rendered composite at camera resolution, without UI or letterboxing.
+    /// Called on the main thread, before the save dialog opens.
+    func snapshotPNG() -> Data? {
+        guard let renderedImage else { return nil }
+        return context.pngRepresentation(of: renderedImage, format: .RGBA8,
+                                         colorSpace: colorSpace, options: [:])
     }
 
     func draw(in view: MTKView) {
-        guard let drawable = view.currentDrawable else {
+        guard inFlight.wait(timeout: .now()) == .success else {
+            redrawPending = true
             return
         }
-
-        guard let image = image else {
-            return
+        var submitted = false
+        defer { if !submitted { inFlight.signal() } }
+        guard view.drawableSize.width > 0, view.drawableSize.height > 0,
+              let drawable = view.currentDrawable,
+              let commandBuffer = commandQueue.makeCommandBuffer() else { return }
+        let bounds = CGRect(x: 0, y: 0, width: drawable.texture.width, height: drawable.texture.height)
+        let black = CIImage(color: .black).cropped(to: bounds)
+        var output = black
+        var frameToCapture: CIImage?
+        if var image, image.extent.width > 0, image.extent.height > 0 {
+            if mirrored { image = image.transformed(by: .init(scaleX: -1, y: 1)) }
+            frameToCapture = image.transformed(by: .init(translationX: -image.extent.minX,
+                                                        y: -image.extent.minY))
+            let scale = min(bounds.width / image.extent.width, bounds.height / image.extent.height)
+            let scaled = image.transformed(by: .init(scaleX: scale, y: scale))
+            let centered = scaled.transformed(by: .init(translationX: bounds.midX - scaled.extent.midX,
+                                                       y: bounds.midY - scaled.extent.midY))
+            output = centered.composited(over: black).cropped(to: bounds)
         }
+        context.render(output, to: drawable.texture, commandBuffer: commandBuffer,
+                       bounds: bounds, colorSpace: colorSpace)
+        commandBuffer.present(drawable)
+        let semaphore = inFlight
+        commandBuffer.addCompletedHandler { [weak self] _ in
+            semaphore.signal()
+            DispatchQueue.main.async { [weak self] in
+                guard let self, self.redrawPending else { return }
+                self.redrawPending = false
+                self.view?.needsDisplay = true
+            }
+        }
+        submitted = true
+        commandBuffer.commit()
+        renderedImage = frameToCapture
+    }
 
-        // A buffer to store all commands
-        let commandBuffer = commandQueue.makeCommandBuffer()
-        // Describe the resources
-        let renderPassDescriptor = view.currentRenderPassDescriptor
-        renderPassDescriptor?.colorAttachments[0].clearColor = MTLClearColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
-        renderPassDescriptor?.colorAttachments[0].loadAction = .clear
-        renderPassDescriptor?.colorAttachments[0].storeAction = .store
-        let renderEncoder = commandBuffer?.makeRenderCommandEncoder(descriptor: renderPassDescriptor!)
-        renderEncoder?.endEncoding()
-
-        let drawableSize = drawable.layer.drawableSize
-        let widthScale = drawableSize.width / image.extent.width
-        let heightScale = drawableSize.height / image.extent.height
-
-        let scale = min(widthScale, heightScale)
-        let scaledImage = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-
-        let xPos = drawableSize.width / 2 - scaledImage.extent.width / 2
-        let yPos = drawableSize.height / 2 - scaledImage.extent.height / 2
-
-        let bounds = CGRect(x: -xPos, y: -yPos, width: drawableSize.width, height: drawableSize.height)
-
-        context.render(scaledImage,
-                        to: drawable.texture,
-                        commandBuffer: commandBuffer,
-                        bounds: bounds,
-                        colorSpace: colorSpace)
-
-        commandBuffer?.present(drawable)
-        commandBuffer?.commit()
+    enum RendererError: LocalizedError {
+        case unavailable
+        var errorDescription: String? { "Metal is not available on this device." }
     }
 }
