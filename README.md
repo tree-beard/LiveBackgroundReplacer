@@ -6,7 +6,7 @@ a PNG snapshot. Includes adjustable background blur and a mirrored preview.
 
 Requires macOS 14.5+. Built with SwiftUI, Vision, Core Image, and Metal.
 
-<img width="700" height="746" alt="app-preview" src="https://github.com/user-attachments/assets/74e1c6f4-c09e-4052-b31b-e615f4c6d766"/>
+<img width="700" alt="LiveBackgroundReplacer with background blur" src="preview/app-preview.png"/>
 
 ## Project structure
 
