@@ -4,7 +4,7 @@ A macOS app for taking photos with a replaced or blurred background. Choose a
 built-in background or upload your own image, preview the result live, and save
 a PNG snapshot. Includes adjustable background blur and a mirrored preview.
 
-Requires macOS 14.5+. Built with SwiftUI, Vision, Core Image, and Metal.
+Requires macOS 15.0+. Built with SwiftUI, Vision, Core Image, and Metal.
 
 <img width="700" alt="LiveBackgroundReplacer with background blur" src="preview/app-preview.png"/>
 

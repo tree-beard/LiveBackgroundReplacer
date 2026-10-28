@@ -29,7 +29,10 @@ final class FrameProcessor {
     }()
 
     func process(_ sampleBuffer: CMSampleBuffer) -> Output? {
-        guard let buffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return nil }
+        guard let buffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
+            return nil
+        }
+
         let source = CIImage(cvPixelBuffer: buffer)
         if case .original = mode {
             return Output(image: source, warning: nil, visionMilliseconds: 0)
@@ -37,8 +40,6 @@ final class FrameProcessor {
 
         let start = ProcessInfo.processInfo.systemUptime
         do {
-            // macOS camera buffers are used in their native orientation. An iOS adapter
-            // must supply a consistent orientation for both the source and Vision.
             try VNImageRequestHandler(cvPixelBuffer: buffer, orientation: .up).perform([segmentationRequest])
             let milliseconds = (ProcessInfo.processInfo.systemUptime - start) * 1_000
             guard let observation = segmentationRequest.results?.first else {
@@ -54,7 +55,10 @@ final class FrameProcessor {
 
     /// Composites the source with the selected background using the person mask.
     func composite(source: CIImage, mask: CIImage) throws -> CIImage {
-        guard Self.valid(source.extent), Self.valid(mask.extent) else { throw ProcessingError.invalidExtent }
+        guard Self.valid(source.extent), Self.valid(mask.extent) else {
+            throw ProcessingError.invalidExtent
+        }
+
         let background: CIImage
         switch mode {
         case .original:
@@ -80,12 +84,18 @@ final class FrameProcessor {
         filter.inputImage = source
         filter.backgroundImage = background
         filter.maskImage = normalizedMask
-        guard let result = filter.outputImage else { throw ProcessingError.noOutput }
+
+        guard let result = filter.outputImage else {
+            throw ProcessingError.noOutput
+        }
         return result.cropped(to: source.extent)
     }
 
     static func aspectFill(_ image: CIImage, in target: CGRect) throws -> CIImage {
-        guard valid(image.extent), valid(target) else { throw ProcessingError.invalidExtent }
+        guard valid(image.extent), valid(target) else {
+            throw ProcessingError.invalidExtent
+        }
+
         let scale = max(target.width / image.extent.width, target.height / image.extent.height)
         let scaled = image.transformed(by: .init(scaleX: scale, y: scale))
         return scaled.transformed(by: .init(translationX: target.midX - scaled.extent.midX,

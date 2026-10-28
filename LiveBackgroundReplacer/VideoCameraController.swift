@@ -26,7 +26,6 @@ final class VideoCameraController: NSObject {
         let warning: String?
     }
 
-    // Callbacks are installed before start and never replaced while capturing.
     var onState: ((UUID, State) -> Void)? // Main queue; identifies the start/stop request.
     var onFrame: ((CIImage) -> Void)? // Processing queue; receiver must be thread safe.
     var onMetrics: ((Metrics) -> Void)? // Main queue, at most once per second.
@@ -53,10 +52,13 @@ final class VideoCameraController: NSObject {
             let error = notification.userInfo?[AVCaptureSessionErrorKey] as? NSError
             let message = error?.localizedDescription ?? "Camera session error."
             self?.sessionQueue.async { [weak self] in
-                guard let self, self.wantsRunning else { return }
+                guard let self, self.wantsRunning else {
+                    return
+                }
                 self.fail(message)
             }
         })
+
         for name in [AVCaptureSession.wasInterruptedNotification, AVCaptureSession.didStopRunningNotification] {
             observers.append(center.addObserver(forName: name, object: session, queue: nil) { [weak self] _ in
                 self?.sessionQueue.async { [weak self] in
@@ -86,7 +88,9 @@ final class VideoCameraController: NSObject {
 
     func startCamera(requestID: UUID) {
         sessionQueue.async { [weak self] in
-            guard let self else { return }
+            guard let self else {
+                return
+            }
             self.requestID = requestID
             self.wantsRunning = true
             self.startIfAuthorized()
@@ -95,7 +99,9 @@ final class VideoCameraController: NSObject {
 
     func stopCamera(requestID: UUID) {
         sessionQueue.async { [weak self] in
-            guard let self else { return }
+            guard let self else {
+                return
+            }
             self.requestID = requestID
             self.wantsRunning = false
             if self.session.isRunning { self.session.stopRunning() }
@@ -104,33 +110,49 @@ final class VideoCameraController: NSObject {
     }
 
     private func startIfAuthorized() {
-        guard wantsRunning else { return }
+        guard wantsRunning else {
+            return
+        }
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
-            guard !session.isRunning else { publish(.running); return }
+            guard !session.isRunning else {
+                publish(.running);
+                return
+            }
             publish(.starting)
             do {
-                if !configured { try configure() }
+                if !configured {
+                    try configure()
+                }
                 processingQueue.async { [weak self] in
-                    guard let self else { return }
+                    guard let self else {
+                        return
+                    }
                     self.intervalStart = ProcessInfo.processInfo.systemUptime
                     self.processedFrames = 0
                     self.droppedFrames = 0
                     self.visionTotal = 0
                 }
+
                 session.startRunning()
-                if session.isRunning { publish(.running) }
+                if session.isRunning {
+                    publish(.running)
+                }
                 else { fail("Unable to start the camera.") }
             } catch {
                 fail(error.localizedDescription)
             }
         case .notDetermined:
-            guard !requestingAccess else { return }
+            guard !requestingAccess else {
+                return
+            }
             requestingAccess = true
             publish(.requestingAccess)
             AVCaptureDevice.requestAccess(for: .video) { [weak self] _ in
                 self?.sessionQueue.async { [weak self] in
-                    guard let self else { return }
+                    guard let self else {
+                        return
+                    }
                     self.requestingAccess = false
                     self.startIfAuthorized()
                 }
@@ -156,14 +178,18 @@ final class VideoCameraController: NSObject {
 
         session.beginConfiguration()
         defer { session.commitConfiguration() }
-        guard session.canAddInput(input) else { throw CameraError.configuration("Unable to add the camera input.") }
+        guard session.canAddInput(input) else {
+            throw CameraError.configuration("Unable to add the camera input.")
+        }
         session.addInput(input)
         guard session.canAddOutput(output) else {
             session.removeInput(input)
             throw CameraError.configuration("Unable to configure video output.")
         }
         session.addOutput(output)
-        if session.canSetSessionPreset(.hd1280x720) { session.sessionPreset = .hd1280x720 }
+        if session.canSetSessionPreset(.hd1280x720) {
+            session.sessionPreset = .hd1280x720
+        }
         // Mirror the final composite in the renderer, keeping Vision and source aligned.
         if let connection = output.connection(with: .video), connection.isVideoMirroringSupported {
             connection.automaticallyAdjustsVideoMirroring = false
@@ -199,7 +225,9 @@ final class VideoCameraController: NSObject {
 extension VideoCameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         autoreleasepool {
-            guard let result = processor.process(sampleBuffer) else { return }
+            guard let result = processor.process(sampleBuffer) else {
+                return
+            }
             onFrame?(result.image)
             processedFrames += 1
             visionTotal += result.visionMilliseconds

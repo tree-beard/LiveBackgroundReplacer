@@ -1,5 +1,6 @@
 import MetalKit
 import CoreImage
+import Synchronization
 
 /// View attachment and drawing happen on the main thread. submit is thread safe
 /// and holds at most one pending frame when the UI cannot keep up.
@@ -11,18 +12,23 @@ final class Renderer: NSObject, MTKViewDelegate {
     private weak var view: MTKView?
     private var image: CIImage?
     private var renderedImage: CIImage?
-    private let frameLock = NSLock()
-    private let inFlight = DispatchSemaphore(value: 3)
-    private var pendingImage: CIImage?
-    private var deliveryScheduled = false
-    private var acceptingFrames = false
+    private struct FrameState {
+        var pendingImage: CIImage?
+        var deliveryScheduled = false
+        var acceptingFrames = false
+    }
+
+    private let frameState = Mutex(FrameState())
+    private var inFlightCount = 0 // Main thread only, including completion updates.
     private var redrawPending = false
     var mirrored = true {
         didSet { view?.needsDisplay = true }
     }
 
     init(device: MTLDevice) throws {
-        guard let queue = device.makeCommandQueue() else { throw RendererError.unavailable }
+        guard let queue = device.makeCommandQueue() else {
+            throw RendererError.unavailable
+        }
         self.device = device
         commandQueue = queue
         context = CIContext(mtlDevice: device)
@@ -41,10 +47,10 @@ final class Renderer: NSObject, MTKViewDelegate {
     }
 
     func setAcceptingFrames(_ accepting: Bool) {
-        frameLock.lock()
-        acceptingFrames = accepting
-        if !accepting { pendingImage = nil }
-        frameLock.unlock()
+        frameState.withLock { state in
+            state.acceptingFrames = accepting
+            if !accepting { state.pendingImage = nil }
+        }
         if !accepting {
             image = nil
             renderedImage = nil
@@ -53,20 +59,26 @@ final class Renderer: NSObject, MTKViewDelegate {
     }
 
     func submit(_ frame: CIImage) {
-        frameLock.lock()
-        guard acceptingFrames else { frameLock.unlock(); return }
-        pendingImage = frame
-        let schedule = !deliveryScheduled
-        deliveryScheduled = true
-        frameLock.unlock()
+        let schedule = frameState.withLock { state in
+            guard state.acceptingFrames else {
+                return false
+            }
+            state.pendingImage = frame
+            let schedule = !state.deliveryScheduled
+            state.deliveryScheduled = true
+            return schedule
+        }
         guard schedule else { return }
         DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.frameLock.lock()
-            let latest = self.pendingImage
-            self.pendingImage = nil
-            self.deliveryScheduled = false
-            self.frameLock.unlock()
+            guard let self else {
+                return
+            }
+            let latest = self.frameState.withLock { state in
+                let latest = state.pendingImage
+                state.pendingImage = nil
+                state.deliveryScheduled = false
+                return latest
+            }
             if let latest {
                 self.image = latest
                 self.view?.needsDisplay = true
@@ -81,25 +93,30 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// Capture the last rendered composite at camera resolution, without UI or letterboxing.
     /// Called on the main thread, before the save dialog opens.
     func snapshotPNG() -> Data? {
-        guard let renderedImage else { return nil }
+        guard let renderedImage else {
+            return nil
+        }
         return context.pngRepresentation(of: renderedImage, format: .RGBA8,
                                          colorSpace: colorSpace, options: [:])
     }
 
     func draw(in view: MTKView) {
-        guard inFlight.wait(timeout: .now()) == .success else {
+        guard inFlightCount < 3 else {
             redrawPending = true
             return
         }
-        var submitted = false
-        defer { if !submitted { inFlight.signal() } }
+
         guard view.drawableSize.width > 0, view.drawableSize.height > 0,
               let drawable = view.currentDrawable,
-              let commandBuffer = commandQueue.makeCommandBuffer() else { return }
+              let commandBuffer = commandQueue.makeCommandBuffer() else {
+            return
+        }
+
         let bounds = CGRect(x: 0, y: 0, width: drawable.texture.width, height: drawable.texture.height)
         let black = CIImage(color: .black).cropped(to: bounds)
         var output = black
         var frameToCapture: CIImage?
+
         if var image, image.extent.width > 0, image.extent.height > 0 {
             if mirrored { image = image.transformed(by: .init(scaleX: -1, y: 1)) }
             frameToCapture = image.transformed(by: .init(translationX: -image.extent.minX,
@@ -110,19 +127,25 @@ final class Renderer: NSObject, MTKViewDelegate {
                                                        y: bounds.midY - scaled.extent.midY))
             output = centered.composited(over: black).cropped(to: bounds)
         }
+
         context.render(output, to: drawable.texture, commandBuffer: commandBuffer,
                        bounds: bounds, colorSpace: colorSpace)
         commandBuffer.present(drawable)
-        let semaphore = inFlight
         commandBuffer.addCompletedHandler { [weak self] _ in
-            semaphore.signal()
             DispatchQueue.main.async { [weak self] in
-                guard let self, self.redrawPending else { return }
+                guard let self else {
+                    return
+                }
+                self.inFlightCount -= 1
+                guard self.redrawPending else {
+                    return
+                }
                 self.redrawPending = false
                 self.view?.needsDisplay = true
             }
         }
-        submitted = true
+
+        inFlightCount += 1
         commandBuffer.commit()
         renderedImage = frameToCapture
     }

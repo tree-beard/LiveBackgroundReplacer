@@ -71,7 +71,9 @@ final class WorkspaceModel: ObservableObject {
             return BackgroundOption(id: id, name: name, image: image, thumbnail: thumbnail)
         }
         do {
-            guard let device = MTLCreateSystemDefaultDevice() else { throw Renderer.RendererError.unavailable }
+            guard let device = MTLCreateSystemDefaultDevice() else {
+                throw Renderer.RendererError.unavailable
+            }
             renderer = try Renderer(device: device)
         } catch {
             renderer = nil
@@ -79,7 +81,9 @@ final class WorkspaceModel: ObservableObject {
         }
         camera.onFrame = { [weak renderer] frame in renderer?.submit(frame) }
         camera.onState = { [weak self] requestID, state in
-            guard let self, self.requestID == requestID else { return }
+            guard let self, self.requestID == requestID else {
+                return
+            }
             self.state = state
             switch state {
             case .failed, .denied, .restricted:
@@ -89,14 +93,18 @@ final class WorkspaceModel: ObservableObject {
             }
         }
         camera.onMetrics = { [weak self] metrics in
-            guard let self, self.requestedRunning else { return }
+            guard let self, self.requestedRunning else {
+                return
+            }
             self.metrics = metrics
         }
         updateMode()
     }
 
     func start() {
-        guard !preview, renderer != nil else { return }
+        guard !preview, renderer != nil else {
+            return
+        }
         requestedRunning = true
         requestID = UUID()
         metrics = nil
@@ -105,7 +113,9 @@ final class WorkspaceModel: ObservableObject {
     }
 
     func stop() {
-        guard renderer != nil else { return }
+        guard renderer != nil else {
+            return
+        }
         requestedRunning = false
         requestID = UUID()
         renderer?.setAcceptingFrames(false)
@@ -114,7 +124,9 @@ final class WorkspaceModel: ObservableObject {
     }
 
     func captureSnapshot() {
-        guard !isExportingSnapshot else { return }
+        guard !isExportingSnapshot else {
+            return
+        }
         guard let data = renderer?.snapshotPNG() else {
             snapshotError = "No frame is available yet. Start the camera and try again."
             return
@@ -142,12 +154,16 @@ final class WorkspaceModel: ObservableObject {
                 backgroundImportError = error.localizedDescription
             }
         case .success(let url):
-            guard !isLoadingBackground else { return }
+            guard !isLoadingBackground else {
+                return
+            }
             isLoadingBackground = true
             backgroundQueue.async { [weak self] in
                 let loaded = Result { try Self.loadBackground(from: url) }
                 DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
+                    guard let self else {
+                        return
+                    }
                     self.isLoadingBackground = false
                     switch loaded {
                     case .success(let background):
@@ -163,7 +179,11 @@ final class WorkspaceModel: ObservableObject {
 
     private nonisolated static func loadBackground(from url: URL) throws -> BackgroundOption {
         let hasAccess = url.startAccessingSecurityScopedResource()
-        defer { if hasAccess { url.stopAccessingSecurityScopedResource() } }
+        defer {
+            if hasAccess {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else {
             throw BackgroundImportError.invalidImage
         }
