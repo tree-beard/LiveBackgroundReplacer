@@ -66,7 +66,7 @@ struct BackgroundEffectsStrip: View {
                     EffectTile(title: "Blur", isSelected: selection == .blur) {
                         selection = .blur
                     } content: {
-                        LinearGradient(colors: [.cyan, .indigo, .purple],
+                        LinearGradient(colors: [.green, .indigo, .purple],
                                        startPoint: .bottomLeading, endPoint: .topTrailing)
                             .overlay {
                                 Image(systemName: "drop.fill")
@@ -130,10 +130,10 @@ private struct EffectTile<Content: View>: View {
         Button(action: action) {
             content()
                 .frame(width: 92, height: 92)
-                .clipShape(RoundedRectangle(cornerRadius: 3))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 3)
-                        .strokeBorder(isSelected ? Color.orange : Color.gray.opacity(0.65),
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(isSelected ? Color.indigo : Color.gray.opacity(0.65),
                                       lineWidth: isSelected ? 2 : 1)
                 }
                 .overlay(alignment: .topTrailing) {
@@ -142,7 +142,7 @@ private struct EffectTile<Content: View>: View {
                             .font(.system(size: 12, weight: .bold))
                             .foregroundStyle(.white)
                             .frame(width: 24, height: 24)
-                            .background(.orange, in: Circle())
+                            .background(.indigo, in: Circle())
                             .offset(x: 8, y: -8)
                     }
                 }
